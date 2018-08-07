@@ -1,15 +1,21 @@
+import urllib3
+from utils.logger import logger
 from zeep import Client
 from flask import request
 from flask_restful import Resource
+
+urllib3.disable_warnings()
 
 URL = 'https://api.amil.com.br/sisamil-credenciado/prestador/conecta?wsdl'
 
 
 class Amil(Resource):
     def post(self):
-        try:
-            req = request.json
 
+        req = request.json
+        try:
+
+            logger.info("Confirmar atendimento - Ip %s, New request %s", request.remote_addr, req)
             client = Client(URL)
 
             result = client.service.ConfirmarAtendimento(pedido=req["pedido"],
@@ -21,8 +27,19 @@ class Amil(Resource):
                                                          horaAtendimento=req["horaAtendimento"],
                                                          justificativaConfirmacaoSemToken=req["retorno"])
 
-            return {"message": "Success!",
-                    "retorno": {"codigo": result["Codigo"], "mensagem": result["Mensagem"]}}, 200
+            logger.info("Confirmar atendimento - Ip %s, Response with success %s", request.remote_addr, result)
+
+            return {
+                       "message": "Success!",
+                       "retorno": {
+                           "codigo": result["Codigo"],
+                           "mensagem": result["Mensagem"]
+                       }
+                   }, 200
 
         except Exception as e:
-            return {"message": "Error during send message {}!".format(e)}, 500
+
+            logger.error("Confirmar atendimento - Ip %s, Error during send message %s", request.remote_addr, e)
+            return {
+                       "message": "Error during send message {}!".format(e)
+                   }, 500
