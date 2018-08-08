@@ -83,3 +83,13 @@ pip install -r requirements.txt
     Werkzeug==0.14.1
     zeep==3.1.0
 ```
+
+### How to run app
+
+`gunicorn run:app`
+
+`OR`
+
+`python app.py`
+
+
